@@ -1,6 +1,7 @@
+import os
 import pyautogui
 import time
-
+import uuid
 
 import defines
 pyautogui.PAUSE = defines.pause
@@ -88,46 +89,120 @@ class Char:
         pyautogui.keyDown('up')
         while not reachedGoal:
             color = self.checkIfMapChanges()
-            print(color)
             reachedGoal = all(i < j for i, j in zip(color, defines.black))
         pyautogui.keyUp('up')
         pyautogui.keyUp('right')
 
-    def goToFm1(self):
-        """requires you to be left first in fm."""
-        CharIsLeft = False
-        im = pyautogui.screenshot(region=(0, 0, 800, 600))
-        left = im.getpixel((9, 138))
-        if 212 < left[0] and left[0] < 224:
-            if 200 < left[1] and left[1] < 208:
-                if 14 < left[2] and left[2] < 18:
-                    CharIsLeft = True
-        assert(CharIsLeft)
-        reachedGoal = False
-        pyautogui.keyDown('right')
-        pyautogui.keyDown('up')
-        while not reachedGoal:
-            color = self.checkIfMapChanges()
-            print(color)
-            reachedGoal = all(i < j for i, j in zip(color, defines.black))
-        pyautogui.keyUp('up')
-        pyautogui.keyUp('right')
 
     def checkStoresLudi(self):
-        storeOpen = False
-        while not storeOpen:
-            pyautogui.click(clicks=2, x=370, y=370)
-            im = pyautogui.screenshot(region=(620, 300, 621, 301))
-            color = im.getpixel((0, 0))
-            storeOpen = all(i > j for i, j in zip(color, defines.white))
+        x = 770
+        y = 370
+        while x > 20:
+            storeOpen = False
+            while not storeOpen:
+                pyautogui.click(clicks=2, x=x, y=y)
+                im = pyautogui.screenshot(region=(620, 300, 621, 301))
+                color = im.getpixel((0, 0))
+                storeOpen = all(i > j for i, j in zip(color, defines.white))
+                x -= 100
+            self.checkStore()
+            print("move to next position")
+        print("next row")
+        x = 800
+        y = 160
+        while x > 20:
+            storeOpen = False
+            while not storeOpen:
+                pyautogui.click(clicks=2, x=x, y=y)
+                im = pyautogui.screenshot(region=(620, 300, 621, 301))
+                color = im.getpixel((0, 0))
+                storeOpen = all(i > j for i, j in zip(color, defines.white))
+                x -= 100
+            self.checkStore()
+        print("next row")
+        x = 800
+        y = 60
+        while x > 20:
+            storeOpen = False
+            while not storeOpen:
+                pyautogui.click(clicks=2, x=x, y=y)
+                im = pyautogui.screenshot(region=(620, 300, 621, 301))
+                color = im.getpixel((0, 0))
+                storeOpen = all(i > j for i, j in zip(color, defines.white))
+                x -= 100
             self.checkStore()
 
-    def checkStore():
-        # 300, 230
-        pyautogui.moveTo(300, 230, duration=0.1)
-        pyautogui.moveTo(301, 231, duration=0.1)
-        pyautogui.moveTo(300, 230, duration=0.1)
-        im = pyautogui.screenshot(region=0, 0, 800, 600)
+
+    def checkStore(self):
+        """ Takes ss of all possible 16 items in a shop.
+        If there are less, redudant screenshots will be created,
+        which will have to be thrown away later."""
+        img = self.checkItem(300, 230)
+        self.saveImgToUniqueFilename(img)
+        img = self.checkItem(300, 270)
+        self.saveImgToUniqueFilename(img)
+        img = self.checkItem(300, 310)
+        self.saveImgToUniqueFilename(img)
+        img = self.checkItem(300, 350)
+        self.saveImgToUniqueFilename(img)
+        img = self.checkItem(300, 390)
+        self.saveImgToUniqueFilename(img)
+        pyautogui.scroll(-1)
+        img = self.checkItem(300, 390)
+        self.saveImgToUniqueFilename(img)
+        pyautogui.scroll(-1)
+        img = self.checkItem(300, 390)
+        self.saveImgToUniqueFilename(img)
+        pyautogui.scroll(-1)
+        img = self.checkItem(300, 390)
+        self.saveImgToUniqueFilename(img)
+        pyautogui.scroll(-1)
+        img = self.checkItem(300, 390)
+        self.saveImgToUniqueFilename(img)
+        pyautogui.scroll(-1)
+        img = self.checkItem(300, 390)
+        self.saveImgToUniqueFilename(img)
+        pyautogui.scroll(-1)
+        img = self.checkItem(300, 390)
+        self.saveImgToUniqueFilename(img)
+        pyautogui.scroll(-1)
+        img = self.checkItem(300, 390)
+        self.saveImgToUniqueFilename(img)
+        pyautogui.scroll(-1)
+        img = self.checkItem(300, 390)
+        self.saveImgToUniqueFilename(img)
+        pyautogui.scroll(-1)
+        img = self.checkItem(300, 390)
+        self.saveImgToUniqueFilename(img)
+        pyautogui.scroll(-1)
+        img = self.checkItem(300, 390)
+        self.saveImgToUniqueFilename(img)
+        pyautogui.scroll(-1)
+        img = self.checkItem(300, 390)
+        self.saveImgToUniqueFilename(img)
+        time.sleep(0.5)
+        pyautogui.click(330, 180)
+
+    def checkItem(self, x, y, img=None):
+        pyautogui.moveTo(x, y, duration=0.1)
+        pyautogui.moveTo(x+1, y, duration=0.1)
+        pyautogui.moveTo(x, y, duration=0.1)
+        im = pyautogui.screenshot(region=(0, 0, 800, 600))
+        if img is not None:
+            # TODO check they are not the same
+            pass
+        time.sleep(0.1)
+        return im
+
+    def saveImgToUniqueFilename(self, img):
+        isUnique = False
+        unique_filename = ""
+        while not isUnique:
+            unique_filename = defines.ssdatabase + str(uuid.uuid4())
+            if not os.path.isfile(unique_filename):
+                isUnique = True
+                unique_filename += '.png'
+        img.save(unique_filename)
 
     def checkStoresHenesys(self):
         pass
